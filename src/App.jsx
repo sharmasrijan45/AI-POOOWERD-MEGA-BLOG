@@ -2,6 +2,8 @@ import { useState , useEffect } from "react"
 import { useDispatch } from "react-redux"
 import authservice, { Authservice } from './Appwrite/auth';
 import { login , logout } from "./store/slice";
+import Header from "./Components/Header/Header";
+import Footer from "./Components/Footer/Footer";
 function App() {
 
 
@@ -23,17 +25,18 @@ authservice.isLoogin().then((data)=>{
 
  if(loading){
   return(
-
-    <div>
-      Loading....
-    </div>
+  <div> loading</div>
+    
   )
  }
  else
  {
   return(
     <>
-    
+    <div className="min-h-screen flex flex-wrap content-between bg-gray-500">
+    <Header />
+    <Footer />
+    </div>
     </>
   )
  }
