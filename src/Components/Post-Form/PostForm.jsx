@@ -5,7 +5,7 @@ import Button from './../Button';
 import Input from './../Input';
 import RTE from '../RTE';
 import service from '../../Appwrite/services';
-import authservice from '../../appwrite/auth';
+import authservice from '../../Appwrite/auth';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 

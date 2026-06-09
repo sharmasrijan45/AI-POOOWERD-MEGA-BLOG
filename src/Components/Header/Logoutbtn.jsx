@@ -1,7 +1,7 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import authservice from '../../Appwrite/auth'
-import { logout } from '../../store/slice'
+import { logout } from '../../store/Slice'
 export default function Logoutbtn() {
     const dispatch = useDispatch()
     const handleLogout = ()=> {
