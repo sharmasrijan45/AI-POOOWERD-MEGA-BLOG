@@ -5,7 +5,6 @@ import Button from './../Button';
 import Input from './../Input';
 import RTE from '../RTE';
 import service from '../../Appwrite/services';
-import authservice from '../../Appwrite/auth';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,8 +19,8 @@ export default function PostForm({ post }) {
     });
 
     const [localPreviewUrl, setLocalPreviewUrl] = useState(null);
-    const [existingPreviewUrl, setExistingPreviewUrl] = useState(null);
     const selectedImage = watch("image");
+    const existingPreviewUrl = post?.capturedimage ? service.getFileView(post.capturedimage) : null;
 
     useEffect(() => {
         if (selectedImage && selectedImage.length > 0) {
@@ -37,27 +36,6 @@ export default function PostForm({ post }) {
 
         setLocalPreviewUrl(null);
     }, [selectedImage]);
-
-    useEffect(() => {
-        let active = true;
-
-        if (post?.capturedimage) {
-            service
-                .getFileView(post.capturedimage)
-                .then((url) => {
-                    if (active) setExistingPreviewUrl(url);
-                })
-                .catch((error) => {
-                    console.error("Unable to load existing image preview", error);
-                });
-        } else {
-            setExistingPreviewUrl(null);
-        }
-
-        return () => {
-            active = false;
-        };
-    }, [post?.capturedimage]);
 
     const navigate = useNavigate();
     const userData = useSelector((state) => state.auth.userData);

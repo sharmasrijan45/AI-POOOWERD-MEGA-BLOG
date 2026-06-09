@@ -1,28 +1,24 @@
 import React from 'react'
-import { useState , useEffect } from 'react'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 export default function Protection ({children , authentication = true}) {
 
 const navigate = useNavigate()
-const [loader , setLoader] = useState(true)
   
 const authstatus = useSelector(state => state.auth.status)  // authentication status from store 
+const shouldRedirect = authstatus !== authentication
+const redirectPath = authentication ? "/login" : "/"
   
 useEffect(()=>{
 
-if(authentication && authstatus !== authentication) {
-
-    navigate("/login")
-}else if( !authentication &&  authstatus !== authentication ) 
-{
-    navigate("/")
+if(shouldRedirect) {
+    navigate(redirectPath)
 }
-setLoader(false)
 
-} , [authstatus , navigate , authentication])
+} , [navigate , redirectPath , shouldRedirect])
 
-   if (loader) {
+   if (shouldRedirect) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
         <div className='text-center'>

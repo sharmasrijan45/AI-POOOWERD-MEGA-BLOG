@@ -12,9 +12,9 @@ export default function Post() {
     const navigate = useNavigate();
 
     const userData = useSelector((state) => state.auth.userData);
-    const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
 
     const isAuthor = post && userData ? post.UserID === userData.$id : false;
+    const imagePreviewUrl = post?.capturedimage ? Service.getFileView(post.capturedimage) : null;
 
     useEffect(() => {
         if (slug) {
@@ -24,26 +24,6 @@ export default function Post() {
             });
         } else navigate("/");
     }, [slug, navigate]);
-
-    useEffect(() => {
-        let active = true;
-
-        if (post?.capturedimage) {
-            Service.getFileView(post.capturedimage)
-                .then((url) => {
-                    if (active) setImagePreviewUrl(url);
-                })
-                .catch((error) => {
-                    console.error("Failed to load post image preview", error);
-                });
-        } else {
-            setImagePreviewUrl(null);
-        }
-
-        return () => {
-            active = false;
-        };
-    }, [post?.capturedimage]);
 
     const deletePost = () => {
         Service.DeletePost(post.$id).then((status) => {

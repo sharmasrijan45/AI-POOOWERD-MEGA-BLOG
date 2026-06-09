@@ -1,30 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import service from '../Appwrite/services'
 import { Link } from 'react-router-dom'
 
 function PostCard({$id , title , image, capturedimage }) {
-  const [previewUrl, setPreviewUrl] = useState(null);
   const imageId = capturedimage || image;
-
-  useEffect(() => {
-    let active = true;
-
-    if (imageId) {
-      service.getFileView(imageId)
-        .then((url) => {
-          if (active) setPreviewUrl(url);
-        })
-        .catch((error) => {
-          console.error('Failed to load card image preview', error);
-        });
-    } else {
-      setPreviewUrl(null);
-    }
-
-    return () => {
-      active = false;
-    };
-  }, [imageId]);
+  const previewUrl = imageId ? service.getFileView(imageId) : null;
 
   return (
    <Link to={ `/post/${$id}` }> 

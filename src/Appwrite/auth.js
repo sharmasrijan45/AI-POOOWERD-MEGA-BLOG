@@ -18,21 +18,13 @@ this.client
 async createAcc({ email , password , name})
 
 {
-    try {
-      const useraccount  = await this.account.create( ID.unique() , email , password , name)
-      return useraccount
-    } catch (error) {
-        throw error
-    }
+    const useraccount  = await this.account.create( ID.unique() , email , password , name)
+    return useraccount
 }
 async login ({email , password})
 {
-    try {
-        await this.account.deleteSessions('current').catch(() => null)
-        return await this.account.createEmailPasswordSession(email , password)
-    } catch (error) {
-        throw error   
-    }
+    await this.account.deleteSessions('current').catch(() => null)
+    return await this.account.createEmailPasswordSession(email , password)
 }
 async isLoogin () //get current user 
 {
@@ -48,11 +40,7 @@ async isLoogin () //get current user
 
 async logout()
 {
-       try {
      return   await this.account.deleteSessions('current');
-    } catch (error) {
-        throw error
-    }
 } 
 }
 
