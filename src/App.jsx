@@ -2,7 +2,7 @@ import { useState , useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { Outlet } from "react-router-dom"
 import authservice from './Appwrite/auth';
-import { login , logout } from "./store/Slice";
+import { login , logout } from "./store/slice";
 import Header from "./Components/Header/Header";
 import Footer from "./Components/Footer/Footer";
 function App() {

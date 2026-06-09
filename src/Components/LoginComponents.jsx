@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link  , useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import {login as stateLogin} from "../store/Slice"
+import {login as stateLogin} from "../store/slice"
 import { useDispatch } from 'react-redux'
 import Button from './Button';
 import Input from './Input';
