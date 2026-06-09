@@ -1,10 +1,10 @@
 import { Client, Account, ID } from "appwrite";
 import config from "../Config/config";
 
-export class Authservice {
+
+ export class Authservice {
  client = new Client()
  account ;
-
 constructor(){
 
 this.client
@@ -19,33 +19,29 @@ async createAcc({ email , password , name})
 
 {
     try {
-       
       const useraccount  = await this.account.create( ID.unique() , email , password , name)
-if (useraccount) {
-    login()    // if accunt is fund then direct login 
-} else {
-    return useraccount
-}
+      return useraccount
     } catch (error) {
         throw error
     }
 }
 async login ({email , password})
 {
-try {
-
-
-    await this.account.createEmailPasswordSession(email , password)
-    
-} catch (error) {
-    throw error   
+    try {
+        await this.account.deleteSessions('current').catch(() => null)
+        return await this.account.createEmailPasswordSession(email , password)
+    } catch (error) {
+        throw error   
+    }
 }
-}
-async isLoogin ()
+async isLoogin () //get current user 
 {
     try {
-         await this.account.get();
+      return await this.account.get();
     } catch (error) {
+        if (error?.code === 401 || error?.code === 403) {
+            return null
+        }
         throw error
     }
 }
@@ -53,7 +49,7 @@ async isLoogin ()
 async logout()
 {
        try {
-         await this.account.deleteSessions('current');
+     return   await this.account.deleteSessions('current');
     } catch (error) {
         throw error
     }

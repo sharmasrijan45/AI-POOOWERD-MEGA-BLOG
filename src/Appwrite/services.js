@@ -1,4 +1,4 @@
-import { Client, Account, ID , Databases , Storage , Query } from "appwrite";
+import { Client, Account, ID , Databases , Storage , Query, Permission, Role } from "appwrite";
 import config from "../Config/config";
 
 
@@ -17,14 +17,14 @@ export class Service{
     this.storage = new Storage(this.client)
  }
 
-async createPost({content , slug , title , image , status , UserID})
+async createPost({content , slug , title , image , status , userId})
 {
     try {
 
         return await this.databases.createDocument(config.DatabaseID , config.collectionID , slug , 
 
             {
-                content  , title , image , status , UserID
+                content  , title , status , UserID: userId , author: userId , capturedimage: image
             }
         )
         
@@ -33,13 +33,13 @@ async createPost({content , slug , title , image , status , UserID})
     }
 }
 
-async updatepost( slug, {content  , title , image , status , UserID} ){
+async updatePost( slug, {content  , title , image , status , userId} ){
 
 try {
     
 return await this.databases.updateDocument(config.DatabaseID , config.collectionID , slug , 
     {
-content ,  title , image , status
+content ,  title , status , UserID: userId , author: userId , capturedimage: image
 
     })
 
@@ -51,7 +51,7 @@ content ,  title , image , status
 async DeletePost(slug)
 {
     try {
-        return await this.databases.deleteDocument( config.DatabaseID , config.collectionID , slug  )
+         return await this.databases.deleteDocument( config.DatabaseID , config.collectionID , slug )
 
     } catch (error) {
         throw error
@@ -69,10 +69,9 @@ async getpost(slug)
         throw error
     }
 }
-async getposts(query = [Query.equal('status' , "active")]){ // ststus is a  key ,, first we have to build  key in appwrite in database
+async getPosts(query = [Query.equal('status' , "published")]){ // status is a key, first build the key in Appwrite database
 try {
-    
-   return await this.databases.listDocuments(config.DatabaseID , config.collectionID , query)
+    return await this.databases.listDocuments(config.DatabaseID , config.collectionID , query)
 
 } catch (error) {
     throw error
@@ -84,7 +83,12 @@ async uploadFile(files)
 {
 try {
     
-return await this.storage.createFile(config.bucketID , ID.unique() , files)
+return await this.storage.createFile(
+    config.bucketID ,
+    ID.unique() ,
+    files,
+    [Permission.read(Role.any())]
+)
 
 } catch (error) {
     throw error
@@ -95,22 +99,37 @@ return await this.storage.createFile(config.bucketID , ID.unique() , files)
 
 async deleteFile(fileID){
     try {
+        if (!fileID) {
+            return false
+        }
 
-        await this.storage.deleteFile( config.bucketID , fileID )
-            return true
+        await this.storage.deleteFile(config.bucketID, fileID)
+        return true
 
-    } 
-    catch (error) {
+    } catch (error) {
         throw error
     }
 }
 
-async filepreview(fileID )
+async getFilePreview(fileID )
 {
 try {
 
     return this.storage.getFilePreview(
         config.bucketID , 
+        fileID
+    )
+} catch (error) {
+    throw error
+}
+}
+
+async getFileView(fileID )
+{
+try {
+
+    return this.storage.getFileView(
+        config.bucketID ,
         fileID
     )
 } catch (error) {
