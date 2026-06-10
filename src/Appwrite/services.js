@@ -49,6 +49,14 @@ async getPosts(query = [Query.equal('status' , "published")]){ // status is a ke
     return await this.databases.listDocuments(config.DatabaseID , config.collectionID , query)
 }
 
+async getUserPosts(userId){
+    return await this.databases.listDocuments(
+        config.DatabaseID ,
+        config.collectionID ,
+        [Query.equal('UserID' , userId)]
+    )
+}
+
 // FILE RELATED OPERATIONS
 async uploadFile(files)
 {

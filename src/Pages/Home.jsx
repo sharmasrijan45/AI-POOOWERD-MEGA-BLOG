@@ -8,10 +8,17 @@ function Home() {
     const [posts, setPosts] = useState([])
     const [error, setError] = useState("")
     const authStatus = useSelector((state) => state.auth.status)
+    const visiblePosts = authStatus ? posts : []
+    const visibleError = authStatus ? error : ""
 
     useEffect(() => {
+        if (!authStatus) {
+            return
+        }
+
         const loadPosts = async () => {
             try {
+                setError("")
                 const postsResponse = await service.getPosts()
                 if (postsResponse) {
                     setPosts(postsResponse.documents)
@@ -25,20 +32,22 @@ function Home() {
         }
 
         loadPosts()
-    }, [])
+    }, [authStatus])
   
-    if (posts.length === 0) {
+    if (visiblePosts.length === 0) {
         return (
             <div className="w-full py-16 mt-4 text-center">
                 <Container>
                     <div className="flex flex-wrap">
                         <div className="p-2 w-full">
-                            <h1 className="text-4xl font-bold text-white mb-4 animate-pulse">
-                                {authStatus ? "📝 You are signed in, but posts are unavailable." : "🔐 Login to read posts"}
+                            <h1 className="text-4xl font-bold text-white mb-4">
+                                {visibleError
+                                    ? "Posts are unavailable right now."
+                                    : (authStatus ? "No published posts yet." : "Login to read posts")}
                             </h1>
-                            {error && (
+                            {visibleError && (
                                 <p className="mt-4 text-red-400 text-lg font-semibold">
-                                    {error}
+                                    {visibleError}
                                 </p>
                             )}
                         </div>
@@ -55,7 +64,7 @@ function Home() {
                     <div className='h-1 w-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full'></div>
                 </div>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                    {posts.map((post) => (
+                    {visiblePosts.map((post) => (
                         <div key={post.$id}>
                             <PostCard {...post} />
                         </div>

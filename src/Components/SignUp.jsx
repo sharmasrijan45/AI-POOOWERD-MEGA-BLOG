@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Link ,useNavigate} from 'react-router-dom'
+import {Link ,useLocation, useNavigate} from 'react-router-dom'
 import {login} from '../store/slice'
 import {Button, Input, Logo} from './index.js'
 import {useDispatch} from 'react-redux'
@@ -8,9 +8,14 @@ import authservice from './../Appwrite/auth';
 
 function Signup() {
     const navigate = useNavigate()
+    const location = useLocation()
     const [error, setError] = useState("")
     const dispatch = useDispatch()
-    const {register, handleSubmit} = useForm()
+    const {register, handleSubmit, formState: {errors}} = useForm()
+    const requestedPath = location.state?.from
+    const redirectAfterSignup = requestedPath && !["/login", "/signup"].includes(requestedPath)
+        ? requestedPath
+        : "/all-posts"
 
     const create = async(data) => {
         setError("")
@@ -34,7 +39,7 @@ function Signup() {
             }
 
             dispatch(login(userData))
-            navigate("/")
+            navigate(redirectAfterSignup, { replace: true })
         } catch (error) {
             const message = error?.message || String(error)
             setError(message)
@@ -68,28 +73,46 @@ function Signup() {
                         label="Full Name"
                         placeholder="Enter your full name"
                         {...register("name", {
-                            required: true,
+                            required: "Full name is required",
                         })}
                         />
+                        {errors.name && (
+                            <p className="text-sm font-semibold text-red-400">{errors.name.message}</p>
+                        )}
                         <Input
                         label="Email"
                         placeholder="Enter your email"
                         type="email"
                         {...register("email", {
-                            required: true,
+                            required: "Email is required",
                             validate: {
                                 matchPatern: (value) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
                                 "Email address must be a valid address",
                             }
                         })}
                         />
+                        {errors.email && (
+                            <p className="text-sm font-semibold text-red-400">{errors.email.message}</p>
+                        )}
                         <Input
                         label="Password"
                         type="password"
                         placeholder="Enter your password"
                         {...register("password", {
-                            required: true,})}
+                            required: "Password is required",
+                            minLength: {
+                                value: 8,
+                                message: "Password must be at least 8 characters long",
+                            },
+                            maxLength: {
+                                value: 256,
+                                message: "Password cannot be longer than 256 characters",
+                            },
+                        })}
                         />
+                        {errors.password && (
+                            <p className="text-sm font-semibold text-red-400">{errors.password.message}</p>
+                        )}
                         <Button type="submit" className="w-full">
                             Create Account
                         </Button>

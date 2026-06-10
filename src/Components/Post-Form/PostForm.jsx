@@ -51,6 +51,7 @@ export default function PostForm({ post }) {
                 const dbPost = await service.updatePost(post.$id, {
                     ...data,
                     image: file ? file.$id : post.capturedimage,
+                    userId: post.UserID || userData.$id,
                 });
 
                 if (dbPost) {

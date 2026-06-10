@@ -23,7 +23,6 @@ async createAcc({ email , password , name})
 }
 async login ({email , password})
 {
-    await this.account.deleteSession('current').catch(() => null)
     return await this.account.createEmailPasswordSession(email , password)
 }
 async isLoogin () //get current user 

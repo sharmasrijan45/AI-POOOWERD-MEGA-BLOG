@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link  , useNavigate } from 'react-router-dom'
+import { Link  , useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import {login as stateLogin} from "../store/slice"
 import { useDispatch } from 'react-redux'
@@ -10,9 +10,14 @@ import authservice from '../Appwrite/auth'
 import { useForm } from 'react-hook-form'
 function LoginComponents() {
 const navigate = useNavigate()
+const location = useLocation()
 const dispatch = useDispatch()
  const {register,handleSubmit} = useForm()
  const [error , setError] = useState("")
+ const requestedPath = location.state?.from
+ const redirectAfterLogin = requestedPath && !["/login", "/signup"].includes(requestedPath)
+  ? requestedPath
+  : "/all-posts"
 
 // hamesha isi trh se login components bnane hai  like 1 error state .
 const Login = async(data)=> {
@@ -31,7 +36,7 @@ const Login = async(data)=> {
       }
 
       dispatch(stateLogin(userData))
-      navigate("/")
+      navigate(redirectAfterLogin, { replace: true })
     } catch (error) {
         const message = error?.message || String(error)
         setError(message)
