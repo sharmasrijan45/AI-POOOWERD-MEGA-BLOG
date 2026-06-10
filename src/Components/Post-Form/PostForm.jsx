@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import React, { useCallback, useEffect, useMemo } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import Select from '../Select';
 import Button from './../Button';
 import Input from './../Input';
@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 export default function PostForm({ post }) {
-    const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
+    const { register, handleSubmit, setValue, control, getValues } = useForm({
         defaultValues: {
             title: post?.title || "",
             slug: post?.$id || "",
@@ -18,24 +18,23 @@ export default function PostForm({ post }) {
         },
     });
 
-    const [localPreviewUrl, setLocalPreviewUrl] = useState(null);
-    const selectedImage = watch("image");
+    const selectedImage = useWatch({ control, name: "image" });
+    const watchedTitle = useWatch({ control, name: "title" });
     const existingPreviewUrl = post?.capturedimage ? service.getFileView(post.capturedimage) : null;
+    const localPreviewUrl = useMemo(() => {
+        const file = selectedImage?.[0];
+        return file ? URL.createObjectURL(file) : null;
+    }, [selectedImage]);
 
     useEffect(() => {
-        if (selectedImage && selectedImage.length > 0) {
-            const file = selectedImage[0];
-            const url = URL.createObjectURL(file);
-            setLocalPreviewUrl(url);
-
-            return () => {
-                URL.revokeObjectURL(url);
-                setLocalPreviewUrl(null);
-            };
+        if (!localPreviewUrl) {
+            return;
         }
 
-        setLocalPreviewUrl(null);
-    }, [selectedImage]);
+        return () => {
+            URL.revokeObjectURL(localPreviewUrl);
+        };
+    }, [localPreviewUrl]);
 
     const navigate = useNavigate();
     const userData = useSelector((state) => state.auth.userData);
@@ -43,7 +42,7 @@ export default function PostForm({ post }) {
     const submit = async (data) => {
         try {
             if (post) {
-                const file = data.image[0] ? await service.uploadFile(data.image[0]) : null;
+                const file = data.image?.[0] ? await service.uploadFile(data.image[0]) : null;
 
                 if (file) {
                     service.deleteFile(post.capturedimage);
@@ -98,15 +97,9 @@ export default function PostForm({ post }) {
         return "";
     }, []);
 
-    React.useEffect(() => {
-        const subscription = watch((value, { name }) => {
-            if (name === "title") {
-                setValue("slug", slugTransform(value.title), { shouldValidate: true });
-            }
-        });
-
-        return () => subscription.unsubscribe();
-    }, [watch, slugTransform, setValue]);
+    useEffect(() => {
+        setValue("slug", slugTransform(watchedTitle), { shouldValidate: true });
+    }, [watchedTitle, slugTransform, setValue]);
 
     return (
         <form onSubmit={handleSubmit(submit)} className="flex flex-wrap gap-6 bg-linear-to-br from-slate-800 to-slate-900 p-8 rounded-2xl border border-purple-500/30 shadow-2xl shadow-purple-900/50">

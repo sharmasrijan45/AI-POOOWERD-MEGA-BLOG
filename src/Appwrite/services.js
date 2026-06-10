@@ -69,16 +69,24 @@ async deleteFile(fileID){
     return true
 }
 
-async getFilePreview(fileID )
+getFilePreview(fileID )
 {
+    if (!fileID) {
+        return null
+    }
+
     return this.storage.getFilePreview(
         config.bucketID , 
         fileID
     )
 }
 
-async getFileView(fileID )
+getFileView(fileID )
 {
+    if (!fileID) {
+        return null
+    }
+
     return this.storage.getFileView(
         config.bucketID ,
         fileID

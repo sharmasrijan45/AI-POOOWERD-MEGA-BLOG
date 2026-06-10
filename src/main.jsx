@@ -9,10 +9,10 @@ import Home from './Pages/Home.jsx'
 import { Protection } from './Components/index.js'
 import AddPost from './Pages/AddPosts.jsx'
 import AllPosts from './Pages/AllPosts.jsx'
-import EditPost from './Pages/EditPost';
+import EditPost from './Pages/EditPost.jsx';
 import Login from './Pages/Login.jsx'
 import Post from './Pages/Post.jsx'
-import Signup from './Pages/Signup';
+import Signup from './Pages/Signup.jsx';
 
 const router = createBrowserRouter([
   {
