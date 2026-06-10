@@ -23,7 +23,7 @@ async createAcc({ email , password , name})
 }
 async login ({email , password})
 {
-    await this.account.deleteSessions('current').catch(() => null)
+    await this.account.deleteSession('current').catch(() => null)
     return await this.account.createEmailPasswordSession(email , password)
 }
 async isLoogin () //get current user 
@@ -40,7 +40,16 @@ async isLoogin () //get current user
 
 async logout()
 {
-     return   await this.account.deleteSessions('current');
+    try {
+        await this.account.deleteSession('current');
+        return true
+    } catch (error) {
+        if (error?.code === 401 || error?.code === 404) {
+            return true
+        }
+
+        throw error
+    }
 } 
 }
 
